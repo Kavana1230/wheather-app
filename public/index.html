@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Alert App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #67B26F, #4ca2cd);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #2c3e50;
+        }
+        
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        #location {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .weather-info {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .weather-main {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .temperature {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        
+        .details {
+            text-align: left;
+        }
+        
+        .alert-settings {
+            margin-top: 30px;
+            padding: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .alert-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .alerts {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #f8d7da;
+            color: #721c24;
+            display: none;
+        }
+        
+        .weather-forecast {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+        
+        .forecast-day {
+            min-width: 120px;
+            text-align: center;
+            padding: 10px;
+            background-color: rgba(52, 152, 219, 0.1);
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+        
+        .forecast-day img {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Weather Alert App</h1>
+        
+        <div class="search-container">
+            <input type="text" id="location" placeholder="Enter city name">
+            <button id="search-btn">Search</button>
+            <button id="use-location">Use My Location</button>
+        </div>
+        
+        <div id="weather-info" class="weather-info">
+            <h2 id="city-name">City Name</h2>
+            <div class="weather-main">
+                <div class="temperature-container">
+                    <div class="temperature" id="temperature">25°C</div>
+                    <div id="weather-description">Clear Sky</div>
+                </div>
+                <div class="weather-icon">
+                    <img id="weather-icon" src="" alt="Weather icon">
+                </div>
+                <div class="details">
+                    <p>Humidity: <span id="humidity">50</span>%</p>
+                    <p>Wind: <span id="wind-speed">5</span> km/h</p>
+                    <p>Pressure: <span id="pressure">1015</span> hPa</p>
+                </div>
+            </div>
+            
+            <div class="weather-forecast" id="forecast">
+                <!-- Forecast data will be populated here -->
+            </div>
+            
+            <div class="alerts" id="weather-alerts">
+                <!-- Weather alerts will be displayed here -->
+            </div>
+            
+            <div class="alert-settings">
+                <h3>Notification Settings</h3>
+                
+                <div class="alert-toggle">
+                    <span>Rain Alerts</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="rain-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="alert-toggle">
+                    <span>Severe Weather Alerts</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="severe-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <div class="alert-toggle">
+                    <span>Daily Forecast Notification</span>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="daily-toggle">
+                        <span class="slider"></span>
+                    </label>
+                </div>
+                
+                <button id="save-settings">Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API key for OpenWeatherMap
+        const apiKey = 'YOUR_OPENWEATHERMAP_API_KEY'; // Replace with your actual API key
+        
+        // DOM elements
+        const searchBtn = document.getElementById('search-btn');
+        const useLocationBtn = document.getElementById('use-location');
+        const locationInput = document.getElementById('location');
+        const weatherInfo = document.getElementById('weather-info');
+        const cityName = document.getElementById('city-name');
+        const temperature = document.getElementById('temperature');
+        const weatherDescription = document.getElementById('weather-description');
+        const weatherIcon = document.getElementById('weather-icon');
+        const humidity = document.getElementById('humidity');
+        const windSpeed = document.getElementById('wind-speed');
+        const pressure = document.getElementById('pressure');
+        const forecast = document.getElementById('forecast');
+        const weatherAlerts = document.getElementById('weather-alerts');
+        const saveSettingsBtn = document.getElementById('save-settings');
+        
+        // Event listeners
+        searchBtn.addEventListener('click', searchWeather);
+        useLocationBtn.addEventListener('click', getUserLocation);
+        saveSettingsBtn.addEventListener('click', saveNotificationSettings);
+        
+        // Check if notification permission is granted
+        if (Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+            Notification.requestPermission();
+        }
+        
+        // Load saved settings if available
+        window.addEventListener('DOMContentLoaded', loadSavedSettings);
+        
+        function loadSavedSettings() {
+            const settings = JSON.parse(localStorage.getItem('weatherSettings')) || {};
+            
+            if (settings.location) {
+                locationInput.value = settings.location;
+                getWeatherData(settings.location);
+            }
+            
+            if (settings.rainAlerts !== undefined) {
+                document.getElementById('rain-toggle').checked = settings.rainAlerts;
+            }
+            
+            if (settings.severeAlerts !== undefined) {
+                document.getElementById('severe-toggle').checked = settings.severeAlerts;
+            }
+            
+            if (settings.dailyAlerts !== undefined) {
+                document.getElementById('daily-toggle').checked = settings.dailyAlerts;
+            }
+        }
+        
+        function saveNotificationSettings() {
+            const settings = {
+                location: locationInput.value,
+                rainAlerts: document.getElementById('rain-toggle').checked,
+                severeAlerts: document.getElementById('severe-toggle').checked,
+                dailyAlerts: document.getElementById('daily-toggle').checked
+            };
+            
+            localStorage.setItem('weatherSettings', JSON.stringify(settings));
+            showNotification('Settings saved successfully!');
+            
+            // If we have service worker and notifications are enabled, register for push notifications
+            if ('serviceWorker' in navigator && (settings.rainAlerts || settings.severeAlerts || settings.dailyAlerts)) {
+                registerServiceWorker();
+            }
+        }
+        
+        function searchWeather() {
+            const location = locationInput.value.trim();
+            if (location === '') return;
+            
+            getWeatherData(location);
+        }
+        
+        function getUserLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    getWeatherByCoordinates(lat, lon);
+                }, error => {
+                    showNotification('Unable to retrieve your location. Please enter city manually.');
+                });
+            } else {
+                showNotification('Geolocation is not supported by your browser');
+            }
+        }
+        
+        function getWeatherData(city) {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('City not found');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    displayWeatherData(data);
+                    getForecastData(data.coord.lat, data.coord.lon);
+                })
+                .catch(error => {
+                    showNotification(error.message);
+                });
+        }
+        
+        function getWeatherByCoordinates(lat, lon) {
+            fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`)
+                .then(response => response.json())
+                .then(data => {
+                    locationInput.value = data.name;
+                    displayWeatherData(data);
+                    getForecastData(lat, lon);
+                })
+                .catch(error => {
+                    showNotification('Error fetching weather data');
+                });
+        }
+        
+        function getForecastData(lat, lon) {
+            fetch(`https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly&appid=${apiKey}&units=metric`)
+                .then(response => response.json())
+                .then(data => {
+                    displayForecastData(data);
+                    checkForAlerts(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching forecast data:', error);
+                });
+        }
+        
+        function displayWeatherData(data) {
+            weatherInfo.style.display = 'block';
+            cityName.textContent = data.name;
+            temperature.textContent = `${Math.round(data.main.temp)}°C`;
+            weatherDescription.textContent = data.weather[0].description;
+            weatherIcon.src = `https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png`;
+            humidity.textContent = data.main.humidity;
+            windSpeed.textContent = data.wind.speed;
+            pressure.textContent = data.main.pressure;
+        }
+        
+        function displayForecastData(data) {
+            forecast.innerHTML = '';
+            
+            // Display 5-day forecast
+            for (let i = 1; i < 6; i++) {
+                const day = data.daily[i];
+                const date = new Date(day.dt * 1000);
+                const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+                
+                const forecastDay = document.createElement('div');
+                forecastDay.className = 'forecast-day';
+                forecastDay.innerHTML = `
+                    <div>${dayName}</div>
+                    <img src="https://openweathermap.org/img/wn/${day.weather[0].icon}.png" alt="${day.weather[0].description}">
+                    <div>${Math.round(day.temp.day)}°C</div>
+                    <div>${day.weather[0].main}</div>
+                `;
+                
+                forecast.appendChild(forecastDay);
+            }
+        }
+        
+        function checkForAlerts(data) {
+            weatherAlerts.style.display = 'none';
+            weatherAlerts.innerHTML = '';
+            
+            // Check for official alerts from API
+            if (data.alerts && data.alerts.length > 0) {
+                weatherAlerts.style.display = 'block';
+                data.alerts.forEach(alert => {
+                    const alertElement = document.createElement('div');
+                    alertElement.innerHTML = `<strong>${alert.event}</strong>: ${alert.description}`;
+                    weatherAlerts.appendChild(alertElement);
+                });
+                
+                // Send notification if severe alerts are enabled
+                if (document.getElementById('severe-toggle').checked) {
+                    showNotification(`Weather Alert: ${data.alerts[0].event}`, data.alerts[0].description);
+                }
+            }
+            
+            // Check for rain in the next 24 hours
+            const rainInForecast = data.daily.slice(0, 2).some(day => 
+                day.weather[0].main === 'Rain' || 
+                day.weather[0].main === 'Thunderstorm' ||
+                day.weather[0].main === 'Drizzle');
+            
+            if (rainInForecast && document.getElementById('rain-toggle').checked) {
+                const rainAlert = document.createElement('div');
+                rainAlert.innerHTML = '<strong>Rain Alert:</strong> Rain is expected in the next 24 hours.';
+                weatherAlerts.appendChild(rainAlert);
+                weatherAlerts.style.display = 'block';
+                
+                showNotification('Rain Alert', 'Rain is expected in the next 24 hours.');
+            }
+        }
+        
+        function showNotification(title, body = '') {
+            // Browser notification
+            if (Notification.permission === 'granted') {
+                const notification = new Notification(title, {
+                    body: body,
+                    icon: '/path/to/icon.png'
+                });
+            } else {
+                // Fallback alert in the page
+                alert(`${title} ${body}`);
+            }
+        }
+        
+        // Service Worker for push notifications
+        function registerServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            }
+        }
+    </script>
+</body>
+</html>
